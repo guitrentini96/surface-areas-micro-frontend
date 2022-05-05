@@ -18,7 +18,7 @@ const App = () => (
           padding: '10px',
         }}
       >
-        <TriangleForm />
+        <TriangleForm display={true} />
       </Paper>
     </Container>
   </div>

@@ -18,7 +18,7 @@ const App = () => (
           padding: '10px',
         }}
       >
-        <CircleForm />
+        <CircleForm display={true} />
       </Paper>
     </Container>
   </div>
