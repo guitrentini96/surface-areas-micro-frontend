@@ -1,12 +1,22 @@
-import { Button, Stack, TextField, Typography, Alert } from '@mui/material';
+import {
+  Button,
+  Stack,
+  TextField,
+  Typography,
+  Alert,
+  LoadingButton,
+  FormControlLabel,
+} from '@mui/material';
 import React from 'react';
+import axios from 'axios';
 
-function CircleSurfacePage() {
+function CircleSurfacePage(props) {
   const [state, setState] = React.useState({
     diameter: '',
-    area: '',
+    area: 0,
     isInvalid: true,
-    errorMessage: 'Enter a valid diameter',
+    errorMessage: 'Invalid diameter',
+    loading: false,
   });
 
   const handleDiameterInput = (event) => {
@@ -19,13 +29,10 @@ function CircleSurfacePage() {
       const valid = /.*[1-9].*/.test(value);
       // if the value is 0, keep the error message
       if (valid) {
-        const radius = value / 2;
-        const area = 3.14 * Math.pow(radius, 2);
         setState({
           ...state,
           diameter: value,
           isInvalid: !valid,
-          area: area,
         });
       } else {
         setState({
@@ -37,7 +44,7 @@ function CircleSurfacePage() {
     }
   };
 
-  const renderTextFields = () => {
+  const renderTextField = () => {
     return (
       <TextField
         size="small"
@@ -45,6 +52,7 @@ function CircleSurfacePage() {
         variant="outlined"
         value={state.diameter}
         onChange={handleDiameterInput}
+        disabled={state.loading || state.area > 0}
       />
     );
   };
@@ -52,10 +60,70 @@ function CircleSurfacePage() {
   const resetValues = () => {
     setState({
       diameter: '',
-      area: '',
+      area: 0,
       isInvalid: true,
-      errorMessage: 'Enter a valid diameter',
+      errorMessage: 'Invalid diameter',
+      loading: false,
     });
+  };
+
+  const handleSubmit = () => {
+    console.log('creating variables');
+    const diameter = parseFloat(state.diameter);
+    const radius = diameter / 2;
+    const area = 3.14 * radius * radius;
+    let circleId = Math.floor(Math.random() * 100000000);
+
+    const postDiameterAndArea = () => {
+      console.log('posting it');
+      axios.post(
+        'https://oaedqcfxnfmlzqyvfwyc.supabase.co/rest/v1/circle',
+        {
+          id: circleId,
+          diameter: diameter,
+          area: area,
+        },
+        {
+          headers: {
+            apikey:
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hZWRxY2Z4bmZtbHpxeXZmd3ljIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTE3MTExODMsImV4cCI6MTk2NzI4NzE4M30.01hjAN5jecCRn0VG2NfqIuBmKK7Mak8xN7SKsRs48NY',
+            Authorization:
+              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hZWRxY2Z4bmZtbHpxeXZmd3ljIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTE3MTExODMsImV4cCI6MTk2NzI4NzE4M30.01hjAN5jecCRn0VG2NfqIuBmKK7Mak8xN7SKsRs48NY',
+          },
+        }
+      );
+      console.log('posted');
+      setState({
+        ...state,
+        loading: true,
+      });
+    };
+    postDiameterAndArea();
+    async function fetchArea() {
+      console.log('fetching area');
+      const circle = await axios.get(
+        `https://oaedqcfxnfmlzqyvfwyc.supabase.co/rest/v1/circle?id=eq.${circleId}&select=*`,
+        {
+          headers: {
+            apikey:
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hZWRxY2Z4bmZtbHpxeXZmd3ljIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTE3MTExODMsImV4cCI6MTk2NzI4NzE4M30.01hjAN5jecCRn0VG2NfqIuBmKK7Mak8xN7SKsRs48NY',
+            Authorization:
+              'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hZWRxY2Z4bmZtbHpxeXZmd3ljIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTE3MTExODMsImV4cCI6MTk2NzI4NzE4M30.01hjAN5jecCRn0VG2NfqIuBmKK7Mak8xN7SKsRs48NY',
+          },
+        }
+      );
+      console.log(circle);
+
+      const area = circle.data[0].area;
+
+      setState({
+        ...state,
+        loading: false,
+        area: area,
+      });
+    }
+    console.log('starting timer');
+    setTimeout(fetchArea, 10000);
   };
 
   return (
@@ -64,6 +132,7 @@ function CircleSurfacePage() {
         alignItems: 'center',
         height: '100%',
         position: 'relative',
+        display: props.display ? 'box' : 'none',
       }}
     >
       <Typography variant="h4">Circle Surface</Typography>
@@ -76,23 +145,43 @@ function CircleSurfacePage() {
         {state.diameter}
       </Typography>
       <Stack
-        sx={{ height: '40%', width: '80%', justifyContent: 'space-around' }}
+        sx={{ height: '40%', width: '90%', justifyContent: 'space-around' }}
       >
-        {renderTextFields()}
+        {renderTextField()}
         {/* <Button variant="contained" disabled={state.isInvalid}>
           {state.isInvalid ? state.errorMessage : 'submit'}
         </Button> */}
         <Alert
           variant="outlined"
-          severity={state.isInvalid ? 'error' : 'success'}
+          severity={
+            state.isInvalid ? 'error' : state.area === 0 ? 'success' : 'info'
+          }
           action={
-            <Button color="inherit" size="small" onClick={resetValues}>
+            <Button
+              color="inherit"
+              size="small"
+              onClick={resetValues}
+              disabled={state.loading}
+            >
               RESET
             </Button>
           }
         >
-          {state.isInvalid ? state.errorMessage : `Area: ${state.area}`}
+          {state.isInvalid
+            ? state.errorMessage
+            : state.loading
+            ? 'Processing...'
+            : state.area > 0
+            ? `Area: ${state.area}`
+            : 'Valid value'}
         </Alert>
+        <Button
+          variant="contained"
+          disabled={state.isInvalid || state.loading || state.area > 0}
+          onClick={handleSubmit}
+        >
+          GET AREA
+        </Button>
       </Stack>
     </Stack>
   );

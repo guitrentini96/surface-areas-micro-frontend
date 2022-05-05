@@ -16,6 +16,28 @@ function App() {
     showCirclePage: false,
   });
 
+  // React.useEffect(() => {
+  //   const fetchDiameters = async () => {
+  //     const resDiameters = await fetch(
+  //       'https://oaedqcfxnfmlzqyvfwyc.supabase.co/rest/v1/circle?select=*',
+  //       {
+  //         method: 'GET',
+  //         headers: {
+  //           apikey:
+  //             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hZWRxY2Z4bmZtbHpxeXZmd3ljIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTE3MTExODMsImV4cCI6MTk2NzI4NzE4M30.01hjAN5jecCRn0VG2NfqIuBmKK7Mak8xN7SKsRs48NY',
+  //           Authorization:
+  //             'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hZWRxY2Z4bmZtbHpxeXZmd3ljIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTE3MTExODMsImV4cCI6MTk2NzI4NzE4M30.01hjAN5jecCRn0VG2NfqIuBmKK7Mak8xN7SKsRs48NY',
+  //         },
+  //       }
+  //     );
+  //     const returnedDiametersList = await resDiameters.json();
+  //     console.log('these are the diameters:');
+  //     console.log(returnedDiametersList);
+  //   };
+  //   fetchDiameters().catch(console.error);
+  //   console.log('aaaa');
+  // }, []);
+
   const setNewPage = (page) => {
     console.log(`show ${page}`);
     if (page === 'triangle') {
@@ -45,13 +67,8 @@ function App() {
           justifyContent: 'space-between',
         }}
       >
-        {state.showTrianglePage ? (
-          <TriangleForm />
-        ) : state.showCirclePage ? (
-          <CircleForm />
-        ) : (
-          <Typography variant="h4">No page selected</Typography>
-        )}
+        <TriangleForm display={state.showTrianglePage} />
+        <CircleForm display={state.showCirclePage} />
         <PagesToggle page={state.page} setPage={setNewPage} />
       </Stack>
       <BottomBar />
