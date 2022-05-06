@@ -15,7 +15,7 @@ UI Tools provided by Material UI
 - Visual representation of the geometrical shapes
 - Client side validation of the inputs
   - Lets the user know if there aren't enough valid values to calculate the area
-  - In the triangle interface, calculates if the measurements make a real triangle
+  - In the triangle interface, calculates if the measurements makes a real triangle and only enables the "get area" button when it does
 - The axios package ensures safe API calls to the database, with simulated backend congestion of 10 seconds
 
 ## Usage
